@@ -1,44 +1,42 @@
-# Node.js + Argo CD sample
+# Node.js Argo CD Demo
 
-A compact Express service and GitOps manifests for deploying it with Argo CD.
+This sample deploys a small Node.js HTTP service with Argo CD.
 
-## Run it locally
+## 1. Build and push the image
 
-```sh
-npm install
-npm start
+Replace `your-dockerhub-user` with your container registry username:
+
+```powershell
+docker build -t docker.io/your-dockerhub-user/nodejs-argocd-demo:1.0.0 .
+docker push docker.io/your-dockerhub-user/nodejs-argocd-demo:1.0.0
 ```
 
-Open `http://localhost:3000`. Health endpoints are available at `/healthz` and `/readyz`.
+Update the same image value in `k8s/deployment.yaml`.
 
-## Build and publish the image
+## 2. Push this directory to Git
 
-From this directory, replace the image name with your container registry location:
+Update `argocd/application.yaml` so `repoURL` points to the Git repository containing this directory, then commit and push:
 
-```sh
-docker build -t ghcr.io/YOUR_GITHUB_USER/nodejs-argocd-sample:1.0.0 .
-docker push ghcr.io/YOUR_GITHUB_USER/nodejs-argocd-sample:1.0.0
+```powershell
+git add nodejs-argocd-demo
+git commit -m "Add Node.js Argo CD demo"
+git push
 ```
 
-Update `k8s/deployment.yaml` to use that exact image. If your image is private, configure an `imagePullSecret` in the target Kubernetes namespace before syncing.
+## 3. Create the Argo CD application
 
-## Deploy through Argo CD
+Run this from a machine with access to the Kubernetes cluster:
 
-1. Commit and push this folder to a Git repository.
-2. In `argocd/application.yaml`, replace the two `REPLACE_WITH...` values with your GitHub user and repository name.
-3. Apply the Argo CD Application from a machine connected to the cluster:
-
-   ```sh
-   kubectl apply -f argocd/application.yaml
-   ```
-
-Argo CD watches `k8s/` in the repository and deploys it into the `demo` namespace. Automated sync, pruning, self-healing, and namespace creation are enabled.
-
-## Check the deployment
-
-```sh
-kubectl get pods -n demo
-kubectl port-forward service/nodejs-argocd-sample 8080:80 -n demo
+```powershell
+kubectl apply -f nodejs-argocd-demo/argocd/application.yaml
+kubectl get application nodejs-demo -n argocd
+kubectl get pods,svc -n nodejs-demo
 ```
 
-Then visit `http://localhost:8080`.
+The service is internal to the cluster. Test it with port-forwarding:
+
+```powershell
+kubectl port-forward svc/nodejs-demo 8080:80 -n nodejs-demo
+```
+
+Then open `http://localhost:8080`.

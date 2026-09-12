@@ -1,22 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: nodejs-argocd-sample
+  name: nodejs-demo
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://github.com/in3t3/nodejs-argocd-sample.git
+    repoURL: https://github.com/your-github-user/your-kubernetes-repo.git
     targetRevision: main
-    path: nodejs-argocd-sample/k8s
+    path: nodejs-argocd-demo/k8s
   destination:
     server: https://kubernetes.default.svc
-    namespace: nodejs
+    namespace: nodejs-demo
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+    - CreateNamespace=true
