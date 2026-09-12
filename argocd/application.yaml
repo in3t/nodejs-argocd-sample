@@ -8,12 +8,12 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/REPLACE_WITH_YOUR_GITHUB_USER/REPLACE_WITH_YOUR_REPOSITORY.git
+    repoURL: https://github.com/in3t3/nodejs-argocd-sample.git
     targetRevision: main
     path: nodejs-argocd-sample/k8s
   destination:
     server: https://kubernetes.default.svc
-    namespace: demo
+    namespace: nodejs
   syncPolicy:
     automated:
       prune: true
